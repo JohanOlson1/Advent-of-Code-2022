@@ -1,6 +1,0 @@
-# CMake generated Testfile for 
-# Source directory: C:/Users/Johan/Documents/VSCode/Advent_Of_Code_Day_1
-# Build directory: C:/Users/Johan/Documents/VSCode/Advent_Of_Code_Day_1/build
-# 
-# This file includes the relevant testing commands required for 
-# testing this directory and lists subdirectories to be tested as well.
