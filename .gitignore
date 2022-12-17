@@ -1,4 +1,5 @@
 build/
+.cmake/
 .vscode/
 *.exe
-cmake_install.cmake
+*.sh
