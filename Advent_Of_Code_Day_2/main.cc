@@ -4,7 +4,23 @@
 #include <algorithm>
 #include <string>
 
-void task1(const int &string_value, int &score) {
+// Function forward declaration
+void getScoresTask1(const int &string_value, int &score);
+void getScoresTask2(const int &string_value, int &score);
+void calculateScores(std::ifstream &my_file, std::pair<int, int> &scores);
+std::pair<int, int> day2(const std::string input_file_path);
+
+int main() {
+    const std::string input_file_path{"../input_day2.txt"};
+    std::pair<int, int> day2_answers = day2(input_file_path);
+
+    std::cout << "Task 1: " << day2_answers.first << "\n";
+    std::cout << "Task 2: " << day2_answers.second << "\n";
+    return 0;
+}
+
+// Function definition
+void getScoresTask1(const int &string_value, int &score) { // This is a pretty ugly solution, but comp. efficient?
     switch (string_value) {
         case 1: score += 4; break;
         case 2: score += 8; break;
@@ -19,7 +35,7 @@ void task1(const int &string_value, int &score) {
     }
 }
 
-void task2(const int &string_value, int &score) {
+void getScoresTask2(const int &string_value, int &score) {
     switch (string_value) {
         case 1: score += 3; break;
         case 2: score += 4; break;
@@ -34,35 +50,27 @@ void task2(const int &string_value, int &score) {
     }
 }
 
-void day2(int &score_task1, int &score_task2) {
-    std::ifstream myfile("../input.txt");
+void calculateScores(std::ifstream &my_file, std::pair<int, int> &scores) {
     char mychar1{};
     char mychar2{};
     int string_value{};
 
-    if (myfile.is_open()) {
-        std::cout << "File Opened\n";
-        while(myfile) {
-            myfile >> mychar1 >> mychar2;
-            string_value = 10*mychar1 + mychar2 - 737;
-            task1(string_value, score_task1);
-            task2(string_value, score_task2);
-        }
+    while(my_file >> mychar1 >> mychar2) {
+        string_value = 10*mychar1 + mychar2 - 737;
+        getScoresTask1(string_value, scores.first);
+        getScoresTask2(string_value, scores.second);
     }
-    else {
-        std::cout << "Failed to load file\n";
-    }
-    score_task1 -= 3;
-    score_task2 -= 8;
 }
 
-int main() {
-    int predicted_score_task1{ 0 };
-    int predicted_score_task2{ 0 };
+std::pair<int, int> day2(const std::string input_file_path) {
+    std::ifstream my_file(input_file_path);
+    std::pair<int, int> scores{0, 0};
 
-    day2(predicted_score_task1, predicted_score_task2);
-
-    std::cout << "The predicted total score is: " << predicted_score_task1 << "\n";
-    std::cout << "The predicted total score is: " << predicted_score_task2 << "\n";
-    return 0;
+    if (my_file.is_open()) {
+        std::cout << "Input file opened\n";
+        calculateScores(my_file, scores);
+    } else {
+        std::cout << "Failed to load input file\n";
+    }
+    return scores;
 }
