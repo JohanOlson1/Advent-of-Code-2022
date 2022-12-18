@@ -7,9 +7,12 @@
 // Function forward declaration
 void task1(int N_to_mv, int stack_src, int stack_dest, std::vector<std::string> &Stacks);
 void task2(int N_to_mv, int stack_src, int stack_dest, std::vector<std::string> &Stacks);
-std::vector<std::string> readCrateDataToStacks(const std::vector<std::string> &raw_input);
 void parseFileAndMoveCrates(std::ifstream &my_file, std::vector<std::string> &Stacks_task1, std::vector<std::string> &Stacks_task2);
+std::vector<std::string> readCrateDataToStacks(const std::vector<std::string> &raw_input);
+std::pair<std::string, std::string> calculateTopCrates(std::ifstream &my_file);
 std::pair<std::string, std::string> day5(const std::string input_file_path);
+
+
 
 int main() {
     const std::string input_file_path{"../input_day5.txt"};
@@ -40,25 +43,6 @@ void task2(int N_to_mv, int stack_src, int stack_dest, std::vector<std::string> 
     }
 }
 
-std::vector<std::string> readCrateDataToStacks(const std::vector<std::string> &raw_input) {
-    int height = raw_input.size();
-    int length = raw_input[0].size();
-    int stack_amount{ (length + 1)/4 };
-    std::vector<std::string> Stacks{ static_cast<long unsigned int>(stack_amount) }; // Kinda ugly, atleast brace intialization warns us of this
-
-    int stack{ 0 };
-    for (int index = 1; index <= length; index += 4) { // Read over the data s.t. we get a vector of each stack with the content in correct order
-        for (int heigh{height - 1}; heigh >= 0; --heigh) {
-            if( raw_input[heigh][index] != ' ') {
-                Stacks[stack].push_back(raw_input[heigh][index]);
-            }
-        }
-        ++stack;
-    }
-
-    return Stacks;
-}
-
 void parseFileAndMoveCrates(std::ifstream &my_file, std::vector<std::string> &Stacks_task1, std::vector<std::string> &Stacks_task2) {
     int N_to_mv;
     int stack_src;
@@ -82,28 +66,54 @@ void parseFileAndMoveCrates(std::ifstream &my_file, std::vector<std::string> &St
     }
 }
 
+std::vector<std::string> readCrateDataToStacks(const std::vector<std::string> &raw_input) {
+    int height = raw_input.size();
+    int length = raw_input[0].size();
+    int stack_amount{ (length + 1)/4 };
+    std::vector<std::string> Stacks{ static_cast<long unsigned int>(stack_amount) }; // Kinda ugly, atleast brace intialization warns us of this
+
+    int stack{ 0 };
+    for (int index = 1; index <= length; index += 4) { // Read over the data s.t. we get a vector of each stack with the content in correct order
+        for (int heigh{height - 1}; heigh >= 0; --heigh) {
+            if( raw_input[heigh][index] != ' ') {
+                Stacks[stack].push_back(raw_input[heigh][index]);
+            }
+        }
+        ++stack;
+    }
+
+    return Stacks;
+}
+
+std::pair<std::string, std::string> calculateTopCrates(std::ifstream &my_file) {
+    std::pair<std::string, std::string> top_crates;
+    std::string my_line{};
+    std::vector<std::string> raw_input;
+
+        while(std::getline(my_file, my_line) && !my_line.empty()) { // Read the crate input data into a vector of strings
+        raw_input.push_back(my_line);
+    }
+
+    std::vector<std::string> Stacks_task1 = readCrateDataToStacks(raw_input); 
+    std::vector<std::string> Stacks_task2 = readCrateDataToStacks(raw_input); // Not a comp. expensive operation so can duplicate
+
+    parseFileAndMoveCrates(my_file, Stacks_task1, Stacks_task2);
+
+    for (int count = 0; count < Stacks_task1.size(); ++count) {
+        top_crates.first.push_back(Stacks_task1[count].back());
+        top_crates.second.push_back(Stacks_task2[count].back());
+    }
+
+    return top_crates;
+}
+
 std::pair<std::string, std::string> day5(const std::string input_file_path) {
     std::pair<std::string, std::string> top_crates;
     std::ifstream my_file(input_file_path);
 
-    std::string my_line{};
-    std::vector<std::string> raw_input;
-
     if (my_file.is_open()) {
         std::cout << "File Opened\n";
-        while(std::getline(my_file, my_line) && !my_line.empty()) { // Read the crate input data into a vector of strings
-            raw_input.push_back(my_line);
-        }
-
-        std::vector<std::string> Stacks_task1 = readCrateDataToStacks(raw_input); 
-        std::vector<std::string> Stacks_task2 = readCrateDataToStacks(raw_input); // Not a comp. expensive operation so can duplicate
-
-        parseFileAndMoveCrates(my_file, Stacks_task1, Stacks_task2);
-
-        for (int count = 0; count < Stacks_task1.size(); ++count) {
-            top_crates.first.push_back(Stacks_task1[count].back());
-            top_crates.second.push_back(Stacks_task2[count].back());
-        }
+        top_crates = calculateTopCrates(my_file);
     } else {
         std::cout << "Failed to open file\n"; 
     }
